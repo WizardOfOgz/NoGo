@@ -103,23 +103,46 @@ describe NoGo::ProxyAdapter do
 
   describe '#execute' do
     it 'invokes #raise_or_pass_through' do
-      proxy_adapter.should_receive(:raise_or_pass_through).with(:execute, 'SELECT COUNT(*) FROM tables;', nil)
-      proxy_adapter.execute('SELECT COUNT(*) FROM tables;')
+      proxy_adapter.should_receive(:raise_or_pass_through).with(:execute, 'SELECT COUNT(*) FROM tables;', 'name')
+      proxy_adapter.execute('SELECT COUNT(*) FROM tables;', 'name')
     end
 
     it 'invokes #pass_through if SQL is BEGIN' do
-      proxy_adapter.should_receive(:pass_through).with(:execute, 'BEGIN', nil)
-      proxy_adapter.execute('BEGIN')
+      proxy_adapter.should_receive(:pass_through).with(:execute, 'BEGIN', 'name')
+      proxy_adapter.execute('BEGIN', 'name')
     end
 
     it 'invokes #pass_through if SQL is ROLLBACK' do
-      proxy_adapter.should_receive(:pass_through).with(:execute, 'ROLLBACK', nil)
-      proxy_adapter.execute('ROLLBACK')
+      proxy_adapter.should_receive(:pass_through).with(:execute, 'ROLLBACK', 'name')
+      proxy_adapter.execute('ROLLBACK', 'name')
     end
 
     it 'invokes #pass_through if SQL is SAVEPOINT' do
-      proxy_adapter.should_receive(:pass_through).with(:execute, 'SAVEPOINT', nil)
-      proxy_adapter.execute('SAVEPOINT')
+      proxy_adapter.should_receive(:pass_through).with(:execute, 'SAVEPOINT', 'name')
+      proxy_adapter.execute('SAVEPOINT', 'name')
+    end
+  end
+
+  describe '#insert' do
+    it 'invokes #raise_or_pass_through' do
+      proxy_adapter.should_receive(:raise_or_pass_through).with(
+        :insert, 'SQL', 'name', 'pk', 'id_value', 'sequence_name', ['bind']
+      )
+      proxy_adapter.insert('SQL', 'name', 'pk', 'id_value', 'sequence_name', ['bind'])
+    end
+  end
+
+  describe '#select_rows' do
+    it 'invokes #raise_or_pass_through' do
+      proxy_adapter.should_receive(:raise_or_pass_through).with(:select_rows, 'SQL', 'name')
+      proxy_adapter.select_rows('SQL', 'name')
+    end
+  end
+
+  describe '#select' do
+    it 'invokes #raise_or_pass_through' do
+      proxy_adapter.should_receive(:raise_or_pass_through).with(:select, 'SQL', 'name')
+      proxy_adapter.send(:select, 'SQL', 'name')
     end
   end
 
