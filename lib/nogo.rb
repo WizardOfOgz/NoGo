@@ -1,3 +1,3 @@
-require "nogo/version"
-require 'nogo/proxy_adapter'
+require_relative "nogo/version"
+require_relative 'nogo/proxy_adapter'
 
