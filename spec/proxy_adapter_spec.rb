@@ -1,9 +1,12 @@
 require 'spec_helper'
 
 describe NoGo::ProxyAdapter do
+  let(:adapter) { ActiveRecord::ConnectionAdapters::AbstractAdapter.new(mock) }
+  let(:proxy_adapter) { NoGo::ProxyAdapter.new(adapter) }
+
   describe '::new' do
     it 'initializes with adapter argument' do
-      expect{ NoGo::ProxyAdapter.new(ActiveRecord::ConnectionAdapters::AbstractAdapter.new(mock)) }.to_not raise_error
+      expect{ NoGo::ProxyAdapter.new(adapter) }.to_not raise_error
     end
 
     it 'raises error without adapter argument' do
@@ -15,4 +18,8 @@ describe NoGo::ProxyAdapter do
     end
   end
 
+  it 'passes method calls through to the adapter' do
+    adapter.should_receive(:pass_through)
+    proxy_adapter.pass_through
+  end
 end
