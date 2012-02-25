@@ -13,5 +13,8 @@ Gem::Specification.new do |gem|
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   gem.name          = "nogo"
   gem.require_paths = ["lib"]
-  gem.version       = Nogo::VERSION
+  gem.version       = NoGo::VERSION
+
+  gem.add_development_dependency 'rspec', '~> 2.8.0'
+  gem.add_development_dependency 'activerecord', '~> 3.0'
 end
