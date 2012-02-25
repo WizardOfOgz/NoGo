@@ -32,6 +32,19 @@ module NoGo
     def method_missing(method_name, *args, &block)
       @adapter.send(method_name, *args, &block)
     end
+
+    def pass_through(method_name, *args, &block)
+      @adapter.send(method_name, *args, &block)
+    end
+
+    def raise_or_pass_through(method_name, *args, &block)
+      raise 'Database connection is prohibited' if @strategy == :raise
+      warn(method_name, *args, &block) if @strategy == :warn
+      pass_through(method_name, *args, &block)
+    end
+
+    def warn(method_name, *args, &block)
+    end
   end
 end
 

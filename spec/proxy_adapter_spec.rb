@@ -16,15 +16,15 @@ describe NoGo::ProxyAdapter do
     it 'raises error when adapter argument is not an instance of AbstractAdapter' do
       expect{ NoGo::ProxyAdapter.new(Object.new) }.to raise_error(ArgumentError)
     end
-    
+
     it 'initializes @strategy to :raise' do
       NoGo::ProxyAdapter.new(adapter).instance_variable_get(:@strategy).should == :raise
     end
   end
 
-  it 'passes method calls through to the adapter' do
-    adapter.should_receive(:pass_through)
-    proxy_adapter.pass_through
+  it 'passes undefined method calls through to the adapter' do
+    adapter.should_receive(:method_name).with(:arg)
+    proxy_adapter.method_name :arg
   end
 
   describe '#strategy' do
@@ -49,13 +49,51 @@ describe NoGo::ProxyAdapter do
     end
   end
 
+  describe '#pass_through' do
+    it 'sends method call and arguments to @adapter' do
+      adapter.should_receive(:method_name).with(:arg)
+      proxy_adapter.send :pass_through, :method_name, :arg
+    end
+  end
+
   describe '#raise_or_pass_through' do
-    context 'strategy is :raise' do
+    it 'raises an exception when strategy is set to :raise' do
+      proxy_adapter.strategy = :raise
+      expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to raise_error
+    end
+
+    context 'when strategy is set to :warn' do
       before :each do
-        # proxy_adapter.strategy = :raise
+        proxy_adapter.strategy = :warn
       end
 
-      it 'raises an exception in ' do
+      it 'invokes #warn' do
+        adapter.stub(:method_name)
+        proxy_adapter.should_receive(:warn).with(:method_name, :arg)
+        proxy_adapter.send :raise_or_pass_through, :method_name, :arg
+      end
+
+      it 'passes method call through to the adapter' do
+        proxy_adapter.should_receive(:pass_through).with(:method_name, :arg)
+        proxy_adapter.stub(:warn)
+        proxy_adapter.send :raise_or_pass_through, :method_name, :arg
+      end
+    end
+
+    context 'when strategy is set to :pass_through' do
+      before :each do
+        proxy_adapter.strategy = :pass_through
+      end
+
+      it 'does not invoke #warn' do
+        adapter.stub(:method_name)
+        proxy_adapter.should_not_receive(:warn).with(:method_name, :arg)
+        proxy_adapter.send :raise_or_pass_through, :method_name, :arg
+      end
+
+      it 'passes method call through to the adapter' do
+        proxy_adapter.should_receive(:pass_through).with(:method_name, :arg)
+        proxy_adapter.send :raise_or_pass_through, :method_name, :arg
       end
     end
   end
