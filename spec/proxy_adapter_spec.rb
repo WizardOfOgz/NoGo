@@ -54,6 +54,20 @@ describe NoGo::ProxyAdapter do
       adapter.should_receive(:method_name).with(:arg)
       proxy_adapter.send :pass_through, :method_name, :arg
     end
+
+    it 'invokes #warn when strategy is :warn' do
+      proxy_adapter.strategy = :warn
+      adapter.stub(:method_name)
+      proxy_adapter.should_receive(:warn).with(:method_name, :arg)
+      proxy_adapter.send :pass_through, :method_name, :arg
+    end
+
+    it 'does not invoke #warn when strategy is :pass_through' do
+      proxy_adapter.strategy = :pass_through
+      adapter.stub(:method_name)
+      proxy_adapter.should_not_receive(:warn).with(:method_name, :arg)
+      proxy_adapter.send :pass_through, :method_name, :arg
+    end
   end
 
   describe '#raise_or_pass_through' do
@@ -67,15 +81,8 @@ describe NoGo::ProxyAdapter do
         proxy_adapter.strategy = :warn
       end
 
-      it 'invokes #warn' do
-        adapter.stub(:method_name)
-        proxy_adapter.should_receive(:warn).with(:method_name, :arg)
-        proxy_adapter.send :raise_or_pass_through, :method_name, :arg
-      end
-
       it 'passes method call through to the adapter' do
         proxy_adapter.should_receive(:pass_through).with(:method_name, :arg)
-        proxy_adapter.stub(:warn)
         proxy_adapter.send :raise_or_pass_through, :method_name, :arg
       end
     end
@@ -85,16 +92,36 @@ describe NoGo::ProxyAdapter do
         proxy_adapter.strategy = :pass_through
       end
 
-      it 'does not invoke #warn' do
-        adapter.stub(:method_name)
-        proxy_adapter.should_not_receive(:warn).with(:method_name, :arg)
-        proxy_adapter.send :raise_or_pass_through, :method_name, :arg
-      end
-
       it 'passes method call through to the adapter' do
         proxy_adapter.should_receive(:pass_through).with(:method_name, :arg)
         proxy_adapter.send :raise_or_pass_through, :method_name, :arg
       end
     end
   end
+
+  # Overridden methods -------------------------------------------------------
+
+  describe '#execute' do
+    it 'invokes #raise_or_pass_through' do
+      proxy_adapter.should_receive(:raise_or_pass_through).with(:execute, 'SELECT COUNT(*) FROM tables;', nil)
+      proxy_adapter.execute('SELECT COUNT(*) FROM tables;')
+    end
+
+    it 'invokes #pass_through if SQL is BEGIN' do
+      proxy_adapter.should_receive(:pass_through).with(:execute, 'BEGIN', nil)
+      proxy_adapter.execute('BEGIN')
+    end
+
+    it 'invokes #pass_through if SQL is ROLLBACK' do
+      proxy_adapter.should_receive(:pass_through).with(:execute, 'ROLLBACK', nil)
+      proxy_adapter.execute('ROLLBACK')
+    end
+
+    it 'invokes #pass_through if SQL is SAVEPOINT' do
+      proxy_adapter.should_receive(:pass_through).with(:execute, 'SAVEPOINT', nil)
+      proxy_adapter.execute('SAVEPOINT')
+    end
+  end
+
+  # --------------------------------------------------------------------------
 end

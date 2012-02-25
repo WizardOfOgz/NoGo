@@ -27,6 +27,18 @@ module NoGo
       @strategy = strategy_option
     end
 
+    # Overridden methods ----------------------------------------------------------------
+
+    def execute(sql, name = nil)
+      if sql.match /BEGIN|ROLLBACK|SAVEPOINT/
+        pass_through(:execute, sql, name)
+      else
+        raise_or_pass_through(:execute, sql, name)
+      end      
+    end
+
+    # -----------------------------------------------------------------------------------
+
     private
 
     def method_missing(method_name, *args, &block)
@@ -34,12 +46,12 @@ module NoGo
     end
 
     def pass_through(method_name, *args, &block)
+      warn(method_name, *args, &block) if @strategy == :warn
       @adapter.send(method_name, *args, &block)
     end
 
     def raise_or_pass_through(method_name, *args, &block)
       raise 'Database connection is prohibited' if @strategy == :raise
-      warn(method_name, *args, &block) if @strategy == :warn
       pass_through(method_name, *args, &block)
     end
 
@@ -74,10 +86,6 @@ end
   # end
 
 
-
-  # def execute(sql, name = nil)
-  #   raise_or_noop
-  # end
   
   # def insert(sql, name = nil, pk = nil, id_value = nil, sequence_name = nil)
   #   raise_or_noop
