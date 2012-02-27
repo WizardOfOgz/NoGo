@@ -15,6 +15,10 @@ module NoGo
       @strategy = :raise
     end
 
+    def proxied_adapter
+      @adapter
+    end
+
     def strategy
       @strategy
     end
@@ -45,12 +49,16 @@ module NoGo
       raise_or_pass_through(:select_rows, sql, name)
     end
 
+    def select(sql, name = nil)
+      raise_or_pass_through(:select, sql, name)
+    end
+
     # -----------------------------------------------------------------------------------
 
     private
 
     def method_missing(method_name, *args, &block)
-      @adapter.send(method_name, *args, &block)
+      pass_through(method_name, *args, &block)
     end
 
     def pass_through(method_name, *args, &block)
@@ -61,10 +69,6 @@ module NoGo
     def raise_or_pass_through(method_name, *args, &block)
       raise 'Database connection is prohibited' if @strategy == :raise
       pass_through(method_name, *args, &block)
-    end
-
-    def select(sql, name = nil)
-      raise_or_pass_through(:select, sql, name)
     end
 
     def warn(method_name, *args, &block)
