@@ -9,14 +9,14 @@ module NoGo
       See NoGo::ProxyAdapter#strategy
     EOM
 
-    # Include overriden AbstractAdapter methods
-    include NoGo::AbstractMethodOverrides
-
     # Most methods calls should simply be passed on to the proxied adapter.  By undefining most methods we can use 
-    # <tt>method_missing</tt> to 
+    # <tt>method_missing</tt> to accomplish this.
     instance_methods.each do |method_name| 
       undef_method method_name unless method_name =~ /^__|^send$|^object_id$|^extend|^tap|^instance_variable_set|^instance_variable_get/ 
     end
+
+    # Include overriden AbstractAdapter methods
+    include NoGo::AbstractMethodOverrides
 
     # Initializes an instance and sets the proxied adapter and default strategy.  An exception is raised if the argument to <tt>adapter</tt> is 
     # not an instance of <tt>ActiveRecord::ConnectionAdapters::AbstractAdapter</tt>.
@@ -44,7 +44,7 @@ module NoGo
     # a value from <tt>StrategyOptions</tt>
     def strategy=(strategy_option)
       raise ArgumentError.new(
-        "Expected strategy to be set to one of [:raise, :warn, :pass_through], but received #{strategy_option}"
+        "Expected strategy to be set to one of [#{StrategyOptions.map{|opt| ":#{opt}"}.join(', ')}], but received #{strategy_option}"
       ) unless StrategyOptions.include?(strategy_option.to_sym)
 
       @strategy = strategy_option
