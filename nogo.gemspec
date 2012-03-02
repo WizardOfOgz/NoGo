@@ -3,7 +3,7 @@ require File.expand_path('../lib/nogo/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Andy Ogzewalla"]
-  gem.email         = ["andy@socialvolt.com"]
+  gem.email         = ["andyogzewalla@gmail.com"]
   gem.description   = %q{A library that lets you know when your code touches your database}
   gem.summary       = %q{A library that lets you know when your code touches your database}
   gem.homepage      = ""
@@ -15,6 +15,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = NoGo::VERSION
 
+  gem.add_dependency 'rspec', '~> 2.8.0'
   gem.add_development_dependency 'rspec', '~> 2.8.0'
   gem.add_development_dependency 'activerecord', '~> 3.0'
 end
