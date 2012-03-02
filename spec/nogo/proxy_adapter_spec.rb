@@ -7,13 +7,13 @@ describe NoGo::ProxyAdapter do
   before :all do
     NoGo::ProxyAdapter.class_eval do
 
-      # Ugh, rspec mocks freak out if we try to pass calls to #is_a? through to the proxied adapter
-      def is_a?(klass)  # :nodoc: 
+      # Ugh, rspec mocks freak out if we try to pass calls to
+      def is_a?(klass)
         proxied_adapter.is_a?(klass)
       end
 
       private
-      def method_missing_with_test_filter(method_name, *args, &block)  # :nodoc: 
+      def method_missing_with_test_filter(method_name, *args, &block)
         # RSpec sends messages directly to method_missing when checking an object with mocked methods.  Why?  I don't know, but it 
         # causes an infinite loop for some of ProxyAdapter methods.  This filter prevents that from happening.
         unless %W[warn pass_through method_missing].include?(method_name.to_s)

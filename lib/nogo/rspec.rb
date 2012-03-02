@@ -1,4 +1,5 @@
-require 'nogo/rspec/dsl'
+require_relative '../nogo'
+require_relative 'rspec/dsl'
 
 
 # class DBSafe

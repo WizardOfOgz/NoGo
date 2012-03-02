@@ -17,6 +17,7 @@ module NoGo
   end
 end
 
+# Adds DSL method to RSpec ExampleGroup instances
 RSpec::Core::DSL.module_eval do
   def nogo(*args, &example_group_block)
     NoGo::RSpec::DSL.nogo_example_group(*args, &example_group_block).register

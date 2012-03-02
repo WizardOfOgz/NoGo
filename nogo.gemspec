@@ -15,7 +15,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = NoGo::VERSION
 
-  gem.add_dependency 'rspec', '~> 2.8.0'
-  gem.add_development_dependency 'rspec', '~> 2.8.0'
+  gem.add_dependency 'rspec', '~> 2.7.0'
+  gem.add_dependency 'activerecord', '~> 3.0'
+  gem.add_development_dependency 'rspec', '~> 2.7.0'
   gem.add_development_dependency 'activerecord', '~> 3.0'
 end
