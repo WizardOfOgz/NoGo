@@ -10,21 +10,28 @@ describe NoGo::Connection do
     end
 
     context do
-      let(:dummy_connection) {mock}
+      let(:adapter) { ActiveRecord::ConnectionAdapters::AbstractAdapter.new(nil)}
+      let(:config) {{:adapter => 'original_adapter'}}
+      
       before :each do
-        ActiveRecord::Base.stub(:connection) { dummy_connection }
-        ActiveRecord::Base.stub(:establish_connection).
-          with(:adapter => :nogo, :target_adapter => dummy_connection)
+        adapter.stub(:connect)
+        ActiveRecord::Base.stub(:connection) { adapter }
+        ActiveRecord::Base.stub(:connection_pool) { mock(:spec => mock(:config => config)) }
       end
 
       it 'proxies the current connection adapter' do
         ActiveRecord::Base.should_receive(:establish_connection).
-          with(:adapter => :nogo, :target_adapter => dummy_connection)
+          with(:adapter => :nogo, :target_adapter => adapter)
         subject.connect!
-        subject.class_variable_get(:@@proxy_adapter).should == dummy_connection
       end
 
-      it 'sets the current proxy adapter' do
+      it 'sets @@proxy_adapter with instance of NoGo::ProxyAdapter generated when establishing connection' do
+        subject.connect!
+        subject.class_variable_get(:@@proxy_adapter).should == adapter
+      end
+
+      it 'sets connection_pool spec config adapter to original (non-proxied) value' do
+        config.should_receive(:[]=).with(:adapter, 'original_adapter')
         subject.connect!
       end
     end
