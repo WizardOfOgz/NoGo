@@ -35,6 +35,27 @@ describe NoGo::RSpec::DSL do
       end
     end
   end
+
+  describe 'NogoBeforeAllBlock' do
+    it 'invokes NoGo::Connection::push_enabled_state' do
+      NoGo::Connection.should_receive(:push_enabled_state)
+      NoGo::Connection.stub(:enabled=)
+      NoGo::RSpec::DSL::NogoBeforeAllBlock.call
+    end
+
+    it 'enables proxy adapter' do
+      NoGo::Connection.stub(:push_enabled_state)
+      NoGo::Connection.should_receive(:enabled=).with(true)
+      NoGo::RSpec::DSL::NogoBeforeAllBlock.call
+    end
+  end
+
+  describe 'NogoAfterAllBlock' do
+    it 'invokes NoGo::Connection::pop_enabled_state' do
+      NoGo::Connection.should_receive(:pop_enabled_state)
+      NoGo::RSpec::DSL::NogoAfterAllBlock.call
+    end
+  end
 end
 
 describe 'nogo' do

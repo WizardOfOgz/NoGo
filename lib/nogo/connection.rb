@@ -2,6 +2,11 @@ module NoGo
   class Connection
     @@proxy_adapter = nil
 
+    # Returns proxy adapter if connected, otherwise raises an error
+    def self.proxy_adapter
+      @@proxy_adapter || raise('Proxy adapter is not connected.  Please run NoGo::Connection.connect! to first establish a connection.')
+    end
+
     # Proxy an existing connection.  Raises an exception if no database
     # connection has been established.
     def self.connect!
@@ -22,23 +27,20 @@ module NoGo
       !!@@proxy_adapter
     end
 
+    def self.enabled=(value)
+      proxy_adapter.enabled = value
+    end
+
     def self.pop_enabled_state
-      @@proxy_adapter.pop_enabled_state
+      proxy_adapter.pop_enabled_state
     end
 
     def self.push_enabled_state
-      @@proxy_adapter.push_enabled_state
+      proxy_adapter.push_enabled_state
     end
 
     def self.strategy=(strategy)
-      raise_if_not_connected
-      @@proxy_adapter.strategy = strategy
-    end
-
-    private
-
-    def self.raise_if_not_connected
-      raise 'Proxy adapter is not connected.  Please run NoGo::Connection.connect! to first establish a connection.' unless connected?
+      proxy_adapter.strategy = strategy
     end
   end
 end

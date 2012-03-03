@@ -3,8 +3,13 @@ require 'rspec'
 module NoGo
   module RSpec
     class DSL
-      NogoBeforeAllBlock = Proc.new { }.freeze
-      NogoAfterAllBlock = Proc.new { }.freeze
+      NogoBeforeAllBlock = Proc.new do
+        NoGo::Connection.push_enabled_state
+        NoGo::Connection.enabled = true
+      end.freeze
+      NogoAfterAllBlock = Proc.new do
+        NoGo::Connection.pop_enabled_state
+      end.freeze
 
       def self.nogo_example_group(*args, &example_group_block)
         ::RSpec::Core::ExampleGroup.describe(*args) do

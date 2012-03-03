@@ -2,6 +2,33 @@ require 'spec_helper'
 
 describe NoGo::Connection do
   subject { NoGo::Connection }
+  let(:proxy_adapter) { mock.as_null_object }
+  before :each do
+    subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+  end
+
+  describe '::proxy_adapter' do
+    let(:proxy_adapter) {mock}
+
+    before :each do
+      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+    end
+
+    it 'raises error if proxy adapter is not connected' do
+      subject.class_variable_set(:@@proxy_adapter, nil)
+      expect{subject.proxy_adapter}.to raise_error
+    end
+
+    it 'does not raise an error if proxy adapter is connected' do
+      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+      expect{subject.proxy_adapter}.to_not raise_error
+    end
+
+    it 'returns proxy adapter if connected' do
+      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+      subject.proxy_adapter.should == proxy_adapter
+    end
+  end
 
   describe '::connect!' do
     it 'raise an error if ActiveRecord is not connected to a database' do
@@ -44,37 +71,20 @@ describe NoGo::Connection do
     end
 
     it 'returns true if proxy adapter has been connected' do
-      subject.class_variable_set(:@@proxy_adapter, mock)
       subject.connected?.should == true
     end    
   end
 
-  describe '::raise_if_not_connected' do
-    it 'raises error if proxy adapter is not connected' do
-      subject.stub(:connected?) { false }
-      expect{subject.send(:raise_if_not_connected)}.to raise_error
-    end
-
-    it 'does not raise an error if proxy adapter is connected' do
-      subject.stub(:connected?) { true }
-      expect{subject.send(:raise_if_not_connected)}.to_not raise_error
+  describe '::enabled=' do
+    it 'invokes #enabled= with argument on proxy adapter' do
+      argument = mock
+      proxy_adapter.should_receive(:enabled=).with(argument)
+      subject.enabled = argument
     end
   end
 
   describe '::strategy=' do
-    let(:proxy_adapter) { mock.as_null_object }
-    before :each do
-      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
-    end
-
-    it 'invokes raise_if_not_connected' do
-      subject.should_receive(:raise_if_not_connected)
-
-      subject.strategy = :strategy
-    end 
-
     it 'calls #strategy= on the proxy adapter' do
-      subject.stub(:raise_if_not_connected)
       proxy_adapter.should_receive(:strategy=).with(:pass_through)
       subject.strategy = :pass_through
     end
@@ -82,8 +92,6 @@ describe NoGo::Connection do
 
   describe '::pop_enabled_state' do
     it 'invokes #pop_enabled_state on the proxy adapter' do
-      proxy_adapter = mock
-      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
       proxy_adapter.should_receive(:pop_enabled_state)
       subject.pop_enabled_state
     end
@@ -91,8 +99,6 @@ describe NoGo::Connection do
 
   describe '::push_enabled_state' do
     it 'invokes #push_enabled_state on the proxy adapter' do
-      proxy_adapter = mock
-      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
       proxy_adapter.should_receive(:push_enabled_state)
       subject.push_enabled_state
     end
