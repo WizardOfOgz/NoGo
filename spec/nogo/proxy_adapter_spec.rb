@@ -138,14 +138,14 @@ describe NoGo::ProxyAdapter do
       end
 
       it 'invokes #warn when enabled' do
-        proxy_adapter.enabled = true
+        proxy_adapter.stub(:enabled?) {true}
         adapter.stub(:method_name)
         proxy_adapter.should_receive(:warn).with(:method_name, :arg)
         proxy_adapter.send :pass_through, :method_name, :arg
       end
 
       it 'does not invoke #warn when disabled' do
-        proxy_adapter.enabled = false
+        proxy_adapter.stub(:enabled?) {false}
         adapter.stub(:method_name)
         proxy_adapter.should_not_receive(:warn).with(:method_name, :arg)
         proxy_adapter.send :pass_through, :method_name, :arg
@@ -167,12 +167,12 @@ describe NoGo::ProxyAdapter do
       end
 
       it 'raises an exception when enabled' do
-        proxy_adapter.enabled = true
+        proxy_adapter.stub(:enabled?) {true}
         expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to raise_error
       end
 
       it 'does not raise an exception when disabled' do
-        proxy_adapter.enabled = false
+        proxy_adapter.stub(:enabled?) {false}
         adapter.stub(:method_name)
         expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to_not raise_error
       end
