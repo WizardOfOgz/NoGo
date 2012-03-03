@@ -31,6 +31,17 @@ module NoGo
       @adapter = adapter
       @strategy = :raise
       self.enabled = false
+      @enabled_state_stack = []
+    end
+
+    # Pops the last value from <tt>enabled_state_stack</tt> and assigns it to <tt>enabled</tt>.
+    def pop_enabled_state
+      self.enabled = @enabled_state_stack.pop || false
+    end
+
+    # Pushes the current value of <tt>enabled</tt> onto <tt>enabled_state_stack</tt>.
+    def push_enabled_state
+      @enabled_state_stack.push(enabled)
     end
 
     # Returns the adapter which is being proxied by the current object.
@@ -42,7 +53,6 @@ module NoGo
     def strategy
       @strategy
     end
-
 
     # Sets the current strategy for this adapter.  Raises an <tt>ArgumentErrer</tt> if <tt>strategy_option</tt> is not
     # a value from <tt>StrategyOptions</tt>

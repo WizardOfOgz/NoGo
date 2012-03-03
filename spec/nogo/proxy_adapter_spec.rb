@@ -51,6 +51,10 @@ describe NoGo::ProxyAdapter do
     NoGo::ProxyAdapter.new(adapter).enabled.should == false
   end
 
+  it 'initializes enabled_state_stack to []' do
+    NoGo::ProxyAdapter.new(adapter).instance_variable_get(:@enabled_state_stack).should == []
+  end
+
   describe '#proxied_adapter' do
     it 'returns adapter' do
       proxy_adapter.proxied_adapter.should == adapter
@@ -62,6 +66,45 @@ describe NoGo::ProxyAdapter do
       adapter.stub(:is_a?).with(ActiveRecord::ConnectionAdapters::AbstractAdapter) { true }
       adapter.should_receive(:is_a?).with(Class)
       proxy_adapter.is_a?(Class)
+    end
+  end
+
+  describe '#pop_enabled_state' do
+    it 'assigns true to enabled when last value on the stack is true' do
+      proxy_adapter.instance_variable_set(:@enabled_state_stack, [true])
+      proxy_adapter.enabled = nil
+      proxy_adapter.pop_enabled_state
+      proxy_adapter.enabled.should == true
+    end
+
+    it 'assigns false to enabled when last value on the stack is false' do
+      proxy_adapter.instance_variable_set(:@enabled_state_stack, [false])
+      proxy_adapter.enabled = nil
+      proxy_adapter.pop_enabled_state
+      proxy_adapter.enabled.should == false
+    end
+
+    it 'assigns false to enabled when stack is empty' do
+      proxy_adapter.instance_variable_set(:@enabled_state_stack, [])
+      proxy_adapter.enabled = nil
+      proxy_adapter.pop_enabled_state
+      proxy_adapter.enabled.should == false
+    end
+  end
+
+  describe '#push_enabled_state' do
+    it 'pushes true to the stack when enabled is true' do
+      proxy_adapter.instance_variable_set(:@enabled_state_stack, [])
+      proxy_adapter.enabled = true
+      proxy_adapter.push_enabled_state
+      proxy_adapter.instance_variable_get(:@enabled_state_stack).should == [true]
+    end
+
+    it 'pushes false to the stack when enabled is false' do
+      proxy_adapter.instance_variable_set(:@enabled_state_stack, [])
+      proxy_adapter.enabled = false
+      proxy_adapter.push_enabled_state
+      proxy_adapter.instance_variable_get(:@enabled_state_stack).should == [false]
     end
   end
 
