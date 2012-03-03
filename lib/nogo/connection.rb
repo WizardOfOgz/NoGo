@@ -22,6 +22,14 @@ module NoGo
       !!@@proxy_adapter
     end
 
+    def self.pop_enabled_state
+      @@proxy_adapter.pop_enabled_state
+    end
+
+    def self.push_enabled_state
+      @@proxy_adapter.push_enabled_state
+    end
+
     def self.strategy=(strategy)
       raise_if_not_connected
       @@proxy_adapter.strategy = strategy

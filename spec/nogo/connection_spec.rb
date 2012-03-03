@@ -79,4 +79,22 @@ describe NoGo::Connection do
       subject.strategy = :pass_through
     end
   end
+
+  describe '::pop_enabled_state' do
+    it 'invokes #pop_enabled_state on the proxy adapter' do
+      proxy_adapter = mock
+      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+      proxy_adapter.should_receive(:pop_enabled_state)
+      subject.pop_enabled_state
+    end
+  end
+
+  describe '::push_enabled_state' do
+    it 'invokes #push_enabled_state on the proxy adapter' do
+      proxy_adapter = mock
+      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+      proxy_adapter.should_receive(:push_enabled_state)
+      subject.push_enabled_state
+    end
+  end
 end
