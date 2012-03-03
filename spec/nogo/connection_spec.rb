@@ -60,4 +60,23 @@ describe NoGo::Connection do
       expect{subject.send(:raise_if_not_connected)}.to_not raise_error
     end
   end
+
+  describe '::strategy=' do
+    let(:proxy_adapter) { mock.as_null_object }
+    before :each do
+      subject.class_variable_set(:@@proxy_adapter, proxy_adapter)
+    end
+
+    it 'invokes raise_if_not_connected' do
+      subject.should_receive(:raise_if_not_connected)
+
+      subject.strategy = :strategy
+    end 
+
+    it 'calls #strategy= on the proxy adapter' do
+      subject.stub(:raise_if_not_connected)
+      proxy_adapter.should_receive(:strategy=).with(:pass_through)
+      subject.strategy = :pass_through
+    end
+  end
 end

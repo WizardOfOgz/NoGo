@@ -21,6 +21,11 @@ module NoGo
       !!@@proxy_adapter
     end
 
+    def self.strategy=(strategy)
+      raise_if_not_connected
+      @@proxy_adapter.strategy = strategy
+    end
+
     private
 
     def self.raise_if_not_connected
