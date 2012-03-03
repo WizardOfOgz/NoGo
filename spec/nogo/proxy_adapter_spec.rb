@@ -51,40 +51,6 @@ describe NoGo::ProxyAdapter do
     NoGo::ProxyAdapter.new(adapter).enabled.should == false
   end
 
-  describe '#enabled?' do
-    context 'enabled set to true' do
-      before :each do
-        proxy_adapter.enabled = true
-      end
-
-      it 'returns true if block_enabled is set to true' do
-        proxy_adapter.block_enabled = true
-        proxy_adapter.enabled?.should == true
-      end
-
-      it 'returns true if block_enabled is set to true' do
-        proxy_adapter.block_enabled = false
-        proxy_adapter.enabled?.should == true
-      end
-    end
-
-    context 'enabled set to true' do
-      before :each do
-        proxy_adapter.enabled = false
-      end
-
-      it 'returns true if block_enabled is set to true' do
-        proxy_adapter.block_enabled = true
-        proxy_adapter.enabled?.should == true
-      end
-
-      it 'returns true if block_enabled is set to true' do
-        proxy_adapter.block_enabled = false
-        proxy_adapter.enabled?.should == false
-      end
-    end
-  end
-    
   describe '#proxied_adapter' do
     it 'returns adapter' do
       proxy_adapter.proxied_adapter.should == adapter
@@ -138,14 +104,14 @@ describe NoGo::ProxyAdapter do
       end
 
       it 'invokes #warn when enabled' do
-        proxy_adapter.stub(:enabled?) {true}
+        proxy_adapter.enabled = true
         adapter.stub(:method_name)
         proxy_adapter.should_receive(:warn).with(:method_name, :arg)
         proxy_adapter.send :pass_through, :method_name, :arg
       end
 
       it 'does not invoke #warn when disabled' do
-        proxy_adapter.stub(:enabled?) {false}
+        proxy_adapter.enabled = false
         adapter.stub(:method_name)
         proxy_adapter.should_not_receive(:warn).with(:method_name, :arg)
         proxy_adapter.send :pass_through, :method_name, :arg
@@ -167,12 +133,12 @@ describe NoGo::ProxyAdapter do
       end
 
       it 'raises an exception when enabled' do
-        proxy_adapter.stub(:enabled?) {true}
+        proxy_adapter.enabled = true
         expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to raise_error
       end
 
       it 'does not raise an exception when disabled' do
-        proxy_adapter.stub(:enabled?) {false}
+        proxy_adapter.enabled = false
         adapter.stub(:method_name)
         expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to_not raise_error
       end
