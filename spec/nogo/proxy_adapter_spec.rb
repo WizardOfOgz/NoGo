@@ -51,6 +51,40 @@ describe NoGo::ProxyAdapter do
     NoGo::ProxyAdapter.new(adapter).enabled.should == false
   end
 
+  describe '#enabled?' do
+    context 'enabled set to true' do
+      before :each do
+        proxy_adapter.enabled = true
+      end
+
+      it 'returns true if block_enabled is set to true' do
+        proxy_adapter.block_enabled = true
+        proxy_adapter.enabled?.should == true
+      end
+
+      it 'returns true if block_enabled is set to true' do
+        proxy_adapter.block_enabled = false
+        proxy_adapter.enabled?.should == true
+      end
+    end
+
+    context 'enabled set to true' do
+      before :each do
+        proxy_adapter.enabled = false
+      end
+
+      it 'returns true if block_enabled is set to true' do
+        proxy_adapter.block_enabled = true
+        proxy_adapter.enabled?.should == true
+      end
+
+      it 'returns true if block_enabled is set to true' do
+        proxy_adapter.block_enabled = false
+        proxy_adapter.enabled?.should == false
+      end
+    end
+  end
+    
   describe '#proxied_adapter' do
     it 'returns adapter' do
       proxy_adapter.proxied_adapter.should == adapter

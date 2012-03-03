@@ -5,6 +5,7 @@ module NoGo
     # Proxy an existing connection.  Raises an exception if no database
     # connection has been established.
     def self.connect!
+      # TODO: Abstract away ORM-specific code *
       original_adapter = ActiveRecord::Base.connection_pool.spec.config[:adapter]
       ActiveRecord::Base.establish_connection :adapter => :nogo, :target_adapter => ActiveRecord::Base.connection
       @@proxy_adapter = ActiveRecord::Base.connection

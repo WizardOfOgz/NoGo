@@ -6,6 +6,7 @@ module ActiveRecord
     def self.nogo_connection(config)
       proxy_adapter = NoGo::ProxyAdapter.new(config[:target_adapter])
       proxy_adapter.proxied_adapter.send :connect # TODO: It would be nice if we could detect whether the adapter was connected before, but for now just attempt to reconnect it. ActiveRecord disconnects the adapter before calling <tt>::nogo_connection</tt> *
+      # TODO: This is probably where connection pool config should be set rather than in NoGo::Connection::connect! *
       proxy_adapter
     end
   end
