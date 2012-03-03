@@ -16,6 +16,8 @@ module NoGo
       undef_method method_name unless method_name =~ /^__|^send$|^object_id$|^extend|^tap|^instance_variable_set|^instance_variable_get/ 
     end
 
+    attr_accessor :enabled
+
     # Include overriden AbstractAdapter methods
     include NoGo::AbstractMethodOverrides
 
@@ -28,6 +30,7 @@ module NoGo
 
       @adapter = adapter
       @strategy = :raise
+      self.enabled = false
     end
 
     # Returns the adapter which is being proxied by the current object.
@@ -61,13 +64,13 @@ module NoGo
     # Passes a method call to the proxied adapter.
     # If the strategy is set to <tt>:warn</tt> then <tt>#warn</tt> will be invoked.
     def pass_through(method_name, *args, &block) # :doc: 
-      warn(method_name, *args, &block) if @strategy == :warn
+      warn(method_name, *args, &block) if enabled && @strategy == :warn
       proxied_adapter.send(method_name, *args, &block)
     end
 
     # Raises an error if the current strategy is <tt>:raise</tt> and otherwise defers the method call to <tt>#pass_through</tt>.
     def raise_or_pass_through(method_name, *args, &block) # :doc:
-      raise ErrorMessageForRaiseStrategy if @strategy == :raise
+      raise ErrorMessageForRaiseStrategy if enabled && @strategy == :raise
       pass_through(method_name, *args, &block)
     end
 

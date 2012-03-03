@@ -47,6 +47,10 @@ describe NoGo::ProxyAdapter do
     proxy_adapter.method_name :arg
   end
 
+  it 'initializes enabled to false' do
+    NoGo::ProxyAdapter.new(adapter).enabled.should == false
+  end
+
   describe '#proxied_adapter' do
     it 'returns adapter' do
       proxy_adapter.proxied_adapter.should == adapter
@@ -94,11 +98,24 @@ describe NoGo::ProxyAdapter do
       proxy_adapter.send :pass_through, :method_name, :arg
     end
 
-    it 'invokes #warn when strategy is :warn' do
-      proxy_adapter.strategy = :warn
-      adapter.stub(:method_name)
-      proxy_adapter.should_receive(:warn).with(:method_name, :arg)
-      proxy_adapter.send :pass_through, :method_name, :arg
+    context 'when strategy is :warn' do
+      before :each do
+        proxy_adapter.strategy = :warn
+      end
+
+      it 'invokes #warn when enabled' do
+        proxy_adapter.enabled = true
+        adapter.stub(:method_name)
+        proxy_adapter.should_receive(:warn).with(:method_name, :arg)
+        proxy_adapter.send :pass_through, :method_name, :arg
+      end
+
+      it 'does not invoke #warn when disabled' do
+        proxy_adapter.enabled = false
+        adapter.stub(:method_name)
+        proxy_adapter.should_not_receive(:warn).with(:method_name, :arg)
+        proxy_adapter.send :pass_through, :method_name, :arg
+      end
     end
 
     it 'does not invoke #warn when strategy is :pass_through' do
@@ -110,9 +127,21 @@ describe NoGo::ProxyAdapter do
   end
 
   describe '#raise_or_pass_through' do
-    it 'raises an exception when strategy is set to :raise' do
-      proxy_adapter.strategy = :raise
-      expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to raise_error
+    context 'when strategy is set to :raise' do
+      before :each do
+        proxy_adapter.strategy = :raise
+      end
+
+      it 'raises an exception when enabled' do
+        proxy_adapter.enabled = true
+        expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to raise_error
+      end
+
+      it 'does not raise an exception when disabled' do
+        proxy_adapter.enabled = false
+        adapter.stub(:method_name)
+        expect{ proxy_adapter.send :raise_or_pass_through, :method_name, :arg }.to_not raise_error
+      end
     end
 
     context 'when strategy is set to :warn' do
