@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'active_record/connection_adapters/nogo_adapter'
 
 describe ActiveRecord::Base do
   describe '::nogo_connection' do

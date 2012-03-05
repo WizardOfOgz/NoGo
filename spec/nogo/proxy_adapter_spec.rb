@@ -42,7 +42,7 @@ describe NoGo::ProxyAdapter do
     end
   end
 
-  it 'passes undefined method calls through to the adapter' do
+  it 'passes undefined instance method calls through to the adapter' do
     adapter.should_receive(:method_name).with(:arg)
     proxy_adapter.method_name :arg
   end

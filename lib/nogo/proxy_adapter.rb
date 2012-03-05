@@ -66,7 +66,7 @@ module NoGo
 
     private
 
-    # Pass through any undefined method calls.
+    # Pass through any undefined instance method calls.
     def method_missing(method_name, *args, &block)  # :doc:
       pass_through(method_name, *args, &block)
     end
