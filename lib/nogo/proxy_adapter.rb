@@ -6,8 +6,7 @@ module NoGo
     ErrorMessageForRaiseStrategy = <<-EOM.freeze
 
       Access to the database adapter is currently restricted (strategy set to :raise).
-      Set strategy to :pass_through or :warn to allow database access.
-      See NoGo::ProxyAdapter#strategy.
+      Set strategy to :pass_through or :warn to allow database access.  See NoGo::Connection#strategy=.
     EOM
 
     # Most methods calls should simply be passed on to the proxied adapter.  By undefining most methods we can use 
