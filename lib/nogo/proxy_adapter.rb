@@ -84,6 +84,7 @@ module NoGo
 
     # Placeholder for <tt>#warn</tt> method.  This is probably a place to trigger hooks once they are supported
     def warn(method_name, *args, &block) # :doc:
+      puts "\nDatabase adapter accessed from: " + Kernel.caller[0..12].join("\n")
     end
   end
 end

@@ -1,23 +1,66 @@
 ### NoGo is a library to find the places in your code which touch your database
+Nogo's main objective is to help find and prevent code which accesses the database during testing.
 
 ## Installation
 Add nogo to your Gemfile
 
-```
-gem 'nogo'
-```
+```gem 'nogo'```
 
 Or install from the command line
 
-```
-gem install nogo
-```
+```gem install nogo```
 
-## Basic Usage
+## Usage
 
-```
+Currently RSpec 2 is the only test framework which is supported.
 
-```
+### RSpec
+Wrap any spec examples that should not use the database adapter inside a "nogo do" block.
+
+<pre>
+# In your specs
+require 'nogo/rspec' # Automatically connects, so this should be included after the environment is loaded.
+
+describe Klass do
+  it 'works without error' do
+    Klass.create
+  end
+
+  nogo do # Any access to the database inside this block will raise an exception
+    it 'raises error' do
+      expect{ Klass.create }.to raise_error
+    end
+  end
+
+  it 'works without error' do
+    Klass.create
+  end
+end
+</pre>
+
+### Globally enabling NoGo
+By default NoGo will not check requests to the database, even after being connected.  Here is an example of enabling NoGo.
+
+<pre>
+require 'nogo'
+
+# Database adapter should already be connected
+NoGo::Connection.connect!
+
+ModelKlass.create                   # Works as expected
+
+NoGo::Connection.enabled = true
+ModelKlass.create                   # Raises exception
+
+NoGo::Connection.enabled = false
+ModelKlass.create                   # Works as expected
+</pre>
+
+## Platforms
+Tested with:
+
+RSpec 2.7.0, 2.8.0
+ActiveRecord 3.1.3, 3.2.1.
 
 ##LICENSE
 
