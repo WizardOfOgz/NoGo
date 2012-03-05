@@ -1,5 +1,5 @@
 require 'spec_helper'
-require_relative '../../lib/nogo/rspec'
+require_relative '../../lib/nogo/rspec/dsl'
 
 describe NoGo::RSpec::DSL do
   describe '::nogo_example_group' do
@@ -64,5 +64,14 @@ describe 'nogo' do
     dummy_example_group.should_receive(:register)
     NoGo::RSpec::DSL.stub(:nogo_example_group).and_return(dummy_example_group)
     nogo{}
+  end
+end
+
+describe 'database_restricted' do
+  it 'registers a nogo example group' do
+    dummy_example_group = mock
+    dummy_example_group.should_receive(:register)
+    NoGo::RSpec::DSL.stub(:nogo_example_group).and_return(dummy_example_group)
+    database_restricted{}
   end
 end
