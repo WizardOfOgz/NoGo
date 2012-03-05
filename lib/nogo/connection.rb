@@ -13,13 +13,14 @@ module NoGo
       # TODO: Abstract away ORM-specific code *
       original_adapter = ActiveRecord::Base.connection_pool.spec.config[:adapter]
       ActiveRecord::Base.establish_connection :adapter => :nogo, :target_adapter => ActiveRecord::Base.connection
-      @@proxy_adapter = ActiveRecord::Base.connection
 
       # After establishing connection the connection pool config adapter will be set to <tt>:nogo</tt> which
       # may cause problems with gems such as activerecord-import which rely on that value to be set to a
       # standard ActiveRecord database adapter.  Fortunately we can easily change the config setting back to
       # its original value.
       ActiveRecord::Base.connection_pool.spec.config[:adapter] = original_adapter 
+            
+      @@proxy_adapter = ActiveRecord::Base.connection
     end
 
     # Returns true or false to indicate whether a proxy adapter has been connected.
