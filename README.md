@@ -1,5 +1,5 @@
 ### NoGo is a library to find the places in your code which touch your database
-Nogo's main objective is to help find and prevent code which accesses the database during testing.
+NoGo's main objective is to help find and prevent code which accesses the database during testing.  Disconnecting the database completely while running your test suite may be impractical, so NoGo take a different approach by proxying an estabished database connection.  It is possible to enable and disable NoGo as well as change between ```:raise```, ```:warn``` and ```:pass_through``` strategies on the fly.
 
 ## Installation
 Add nogo to your Gemfile
@@ -12,7 +12,7 @@ Or install from the command line
 
 ## Usage
 
-Currently RSpec 2 is the only test framework which is supported.
+NoGo can be used as a standalone library, but it does integrate with the RSpec 2 test framework.
 
 ### RSpec
 Wrap any spec examples that should not use the database adapter inside a "nogo do" block.
