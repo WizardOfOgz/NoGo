@@ -4,7 +4,6 @@ module NoGo
     StrategyOptions = [:raise, :warn, :pass_through].freeze
 
     ErrorMessageForRaiseStrategy = <<-EOM.freeze
-
       Access to the database adapter is currently restricted (strategy set to :raise).
       Set strategy to :pass_through or :warn to allow database access.  See NoGo::Connection#strategy=.
     EOM
